@@ -1,12 +1,12 @@
 DESCRIPCION
 ===========
 
-	Implementacion de algoritmos de desencripcion por fuerza bruta, para textos cifrados con 
-	los algoritmos blowfish o cast5 de la libreria OpenSSL. 
+Implementacion de algoritmos de desencripcion por fuerza bruta, para textos cifrados con 
+los algoritmos blowfish o cast5 de la libreria OpenSSL. 
 
-	La desencripcion se realiza de 3 maneras: de forma serial, a traves de hilos y memoria 
-	compartida utilizando la libreria OpenMP, y a traves de procesos y pasos de mensajes con 
-	la libreria OpenMPI
+La desencripcion se realiza de 3 maneras: de forma serial, a traves de hilos y memoria 
+compartida utilizando la libreria OpenMP, y a traves de procesos y pasos de mensajes con 
+la libreria OpenMPI
 
 PREREQUISITOS
 =============
@@ -22,48 +22,47 @@ INSTALACION
 
 * instalacion usando make
 
-	shell$ make install
+        shell$ make install
 
 * instalacion manual
 
-	Descomprimir todas las librerias ubicadas en el directorio libs
+        Descomprimir todas las librerias ubicadas en el directorio libs
 
-	shell$ tar -zxvf CUnit-2.1-2.tar.gz
-	shell$ tar -zxvf openmpi-1.6.5.tar.gz
-	shell$ tar -zxvf openssl-1.0.1e.tar.gz
+        shell$ tar -zxvf CUnit-2.1-2.tar.gz
+        shell$ tar -zxvf openmpi-1.6.5.tar.gz
+        shell$ tar -zxvf openssl-1.0.1e.tar.gz
 
 * openmpi-1.6.5:
 
-	shell$ cd libs/openmpi-1.6.5
-	shell$ ./configure 
-	[...lots of output...]
-	shell$ sudo make all install
+        shell$ cd libs/openmpi-1.6.5
+        shell$ ./configure 
+        [...lots of output...]
+        shell$ sudo make all install
 
 * CUnit-2.1-2:
 
-	shell$ cd libs/CUnit-2.1-2
-    shell$ ./configure                    
-    shell$ make
-	shell$ make check
-	shell$ sudo make install
+        shell$ cd libs/CUnit-2.1-2
+        shell$ ./configure                    
+        shell$ make
+        shell$ make check
+        shell$ sudo make install
 
 * openssl-1.0.1e:
 	
-	shell$ cd libs/openssl-1.0.1
-	shell$ ./config --prefix=/usr/local
-  	shell$ make
-  	shell$ make test
-  	shell$ sudo make install
+        shell$ cd libs/openssl-1.0.1
+        shell$ ./config --prefix=/usr/local
+        shell$ make
+        shell$ make test
+        shell$ sudo make install
 
-nota: 	en caso de error, leer los archivos INSTALL ubicados en los directorios de
-		las librerias, e intentar reinstalar
+Nota: en caso de error, leer los archivos INSTALL ubicados en los directorios de las librerias, e intentar reinstalar
 
 COMPILACION
 ===========
 
 * para compilar los codigos fuentes:
 
-	shell$ make all
+	   shell$ make all
 
 * se generan 5 ejecutables en la carpeta /bin
 	
@@ -81,48 +80,46 @@ TEST
 
 * para ejecutar los test:
 
-	## ejecutar todos los test
-	shell$ make test
+        ## ejecutar todos los test
+        shell$ make test
 
-	## unicamente test unitarios
-	shell$ make test-unit
+        ## unicamente test unitarios
+        shell$ make test-unit
 
-	## unicamente test de aplicacion 
-	shell$ make test-app  
+        ## unicamente test de aplicacion 
+        shell$ make test-app  
 
-	## unicamente test de utilidades encrypt y decrypt
-	shell$ make test-utils
+        ## unicamente test de utilidades encrypt y decrypt
+        shell$ make test-utils
 
-	nota: todos los test deberian terminar en "passed".
+nota: todos los test deberian terminar en "passed".
 
 
 VARIABLES DE AMBIENTE
 =====================
 
-* CANT_KEYS: 
-	Cantidad de claves para utilizar en la desencripcion por fuerza bruta.
-	Por defecto, si no se configura la cantidad de claves, se utilizan 10^8 
-	claves en la desencripcion. 
+* CANT_KEYS: Cantidad de claves para utilizar en la desencripcion por fuerza bruta.
+Por defecto, si no se configura la cantidad de claves, se utilizan 10^8 claves en la desencripcion. 
 	
 		shell$ export CANT_KEYS=[ cantidad de claves ]
 
-* OMP_NUM_THREADS: 
-	Cantidad de hilos a utilizar por la implementacion en OpenMP.
-	Por defecto, si no se configura la cantidad de hilos, se utilizan 4 hilos
-	para la desencripcion usando OpenMP. Es adecuado configurar la cantidad 
-	de hilos a utilizar igual al numero de cores fisicos que posee el microprocesador,
-	si se utiliza un numero mayor, se obtienen peores resultados de performance. Un 
-	numero menor no aprovecha todas las capacidades del microprocesador. 
+* OMP_NUM_THREADS: Cantidad de hilos a utilizar por la implementacion en OpenMP.
+Por defecto, si no se configura la cantidad de hilos, se utilizan 4 hilos
+para la desencripcion usando OpenMP. Es adecuado configurar la cantidad 
+de hilos a utilizar igual al numero de cores fisicos que posee el microprocesador,
+si se utiliza un numero mayor, se obtienen peores resultados de performance. Un 
+numero menor no aprovecha todas las capacidades del microprocesador. 
 
-		shell$ export OMP_NUM_THREADS=[ cantidad de hilos hijos a utilizar ]
+		shell$ export OMP_NUM_THREADS=[ hilos hijos a utilizar ]
 
 EJECUCION
 =========
 
-* encriptador
-	El programa "encrypt" encripta un archivo, con una clave y un metodo determinado, 
-	y guarda el texto encryptado en un archivo de salida. Todos los parametros son 
-	obligatorios. Las claves deben ser numericas mayores a cero y menores a CANT_KEYS.
+## encriptador
+
+El programa "encrypt" encripta un archivo, con una clave y un metodo determinado, 
+y guarda el texto encryptado en un archivo de salida. Todos los parametros son 
+obligatorios. Las claves deben ser numericas mayores a cero y menores a CANT_KEYS.
 
 	uso: ./encrypt [INPUT FILE] [KEY CODE] [METHOD] [OUTPUT FILE]
 
@@ -131,14 +128,14 @@ EJECUCION
 	METHOD: metodo de cifrado ( blowfish o cast5 )
 	OUTPUT FILE: archivo de salida
 
-	Retorna 0 si la encripcion tuvo exito y se genera el archivo de salida. 
-	En caso de error, retorna un valor distinto de cero, y se imprime en stdout 
-	la causa del error.
+Retorna 0 si la encripcion tuvo exito y se genera el archivo de salida. 
+En caso de error, retorna un valor distinto de cero, y se imprime en stdout 
+la causa del error.
 
-* desencriptador
-	El programa "decrypt" desencripta un archivo, con una clave y metodo determinado, 
-	y guarda el texto desencriptado en un archivo de salida. Todos los parametros son
-    obligatorios. Las claves deben ser numericas mayores a cero y menores a CANT_KEYS.
+## desencriptador
+El programa "decrypt" desencripta un archivo, con una clave y metodo determinado, 
+y guarda el texto desencriptado en un archivo de salida. Todos los parametros son
+obligatorios. Las claves deben ser numericas mayores a cero y menores a CANT_KEYS.
 
 	uso: ./decrypt [INPUT FILE] [KEY CODE] [METHOD] [OUTPUT FILE]
 
@@ -147,14 +144,14 @@ EJECUCION
     METHOD: metodo de cifrado ( blowfish o cast5 )
     OUTPUT FILE: archivo de salida
 
-	Retorna 0 si la encripcion tuvo exito y se genera el archivo de salida.
-    En caso de error, retorna un valor distinto de cero, y se imprime en stdout
-    la causa del error.
+Retorna 0 si la encripcion tuvo exito y se genera el archivo de salida.
+En caso de error, retorna un valor distinto de cero, y se imprime en stdout
+la causa del error.
 
-* algoritmos de fuerza bruta
-	Los programas "serial", "omp", "mpi", intentan desencriptar un archivo con todas las 
-	claves disponibles. Cada uno implementa una forma diferente de dividir el trabajo a 
-	realizar. 
+## algoritmos de fuerza bruta
+Los programas "serial", "omp", "mpi", intentan desencriptar un archivo con todas las 
+claves disponibles. Cada uno implementa una forma diferente de dividir el trabajo a 
+realizar. 
 
 	uso: ./serial ENCRYPTED_FILE
 	uso: ./omp ENCRYPTED_FILE
@@ -163,19 +160,19 @@ EJECUCION
 	ENCRYPTED_FILE: archivo encriptado
 	NUM_PROCES: procesos utilizados por la implementacion mpi
 
-	Estos archivos desencriptan el primer bloque ( 8 bytes ) del archivo de entrada,
-	y buscan la palabra "Frase" en los primeros 5 caracteres.
+Estos archivos desencriptan el primer bloque ( 8 bytes ) del archivo de entrada,
+y buscan la palabra "Frase" en los primeros 5 caracteres.
 
-	La implementacion serial prueba las claves una a la vez. en caso de tener exito detiene las iteraciones
-	La implementacion en hilos divide el trabajo entre los hilos creados usando memoria compartida.
-	La implementacion en procesos divide el trabajo entre los procesos disponibles usando paso de mensajes.
+La implementacion serial prueba las claves una a la vez. en caso de tener exito detiene las iteraciones
+La implementacion en hilos divide el trabajo entre los hilos creados usando memoria compartida.
+La implementacion en procesos divide el trabajo entre los procesos disponibles usando paso de mensajes.
 
-	En caso de exito, retornan 0, y se generan 2 archivos de salida:
+En caso de exito, retornan 0, y se generan 2 archivos de salida:
 
-		* report: contiene informacion del resultado ( clave, metodo de cifrado, tiempo consumido aproximado )
-		* key: contiene la clave que tuvo exito en la desencripcion
+* report: contiene informacion del resultado ( clave, metodo de cifrado, tiempo consumido aproximado )
+* key: contiene la clave que tuvo exito en la desencripcion
 
-	De no tener exito, retornan un valor distinto de 0
+De no tener exito, retornan un valor distinto de 0
 
 DESARROLLO DEL PROYECTO
 =======================
@@ -197,39 +194,39 @@ Una vez comprendida las herramientas a utilizar, se definio la infraestructura a
 del proyecto. En primera instancia, se definio la estructura del proyecto en directorios:
 
 	/
-	----/bin 		// Todos los ejecutables  
-	----/obj  		// Todos los codigos objetos
-	----/doc  		// Documentacion 
-	----/examples  	// Codigos de ejemplo
-	----/input  	// Archivos de entrada para los algoritmos
-	----/output		// Archivos de salida de los algoritmos
-	----/libs  		// Librerias utilizadas
-	----/scripts  	// Bash Scripts
-	----/include  	// Todos los archivos de cabecera
-	----/src		// Todos los codigos fuente
+	----/bin           // Todos los ejecutables  
+	----/obj           // Todos los codigos objetos
+	----/doc           // Documentacion 
+	----/examples      // Codigos de ejemplo
+	----/input         // Archivos de entrada para los algoritmos
+	----/output        // Archivos de salida de los algoritmos
+	----/libs          // Librerias utilizadas
+	----/scripts       // Bash Scripts
+	----/include       // Todos los archivos de cabecera
+	----/src           // Todos los codigos fuente
 
 Una vez definida la estructura del proyecto, se decidio utilizar una herramienta de versionamiento de codigo. 
 Se utilizo Mercurial, y se creo un repositorio local para el proyecto. Esto facilito la recuperacion de archivos 
 en caso de errores durante el desarrollo. Se puede visualizar el desarrollo total del proyecto usando:
 
-	shell$ hg history
+    shell$ hg history
 
 Luego de un analisis mas detallado de los requerimientos, se define una primera arquitectura del proyecto. Se 
 identificaron actividades comunes a todas las implementaciones:
 
-	* Lectura de parametros, variables de ambiente y generacion de resultados
-	* Lectura/Escritura de archivos del File System.
-	* Generacion de claves utilizadas en la encripcion/desencripcion
-	* Ejecucion de la encripcion/desencripcion
+* Lectura de parametros, variables de ambiente y generacion de resultados
+* Lectura/Escritura de archivos del File System.
+* Generacion de claves utilizadas en la encripcion/desencripcion
+* Ejecucion de la encripcion/desencripcion
 
 La arquitectura se dividio en componentes, los cuales implementan las funciones que realizan las actividades comunes.
 La division en componentes permitio simplificar el desarrollo y evolucion del software, permitiendo la reutilizacion 
 de codigo. Los componentes definidos fueron los siguientes:
 
-	* commons:		provee funciones de inicializacion de variables y generacion de resultados
-	* keygen: 		provee funciones para la generacion de claves de 16 bytes
-	* fs: 			provee funciones para la lectura/escritura de archivos
-	* encryptor: 	provee funciones para la encrypcion/desencripcion con blowfish y cast5
+* commons:		provee funciones de inicializacion de variables y generacion de resultados
+* keygen: 		provee funciones para la generacion de claves de 16 bytes
+* fs: 			provee funciones para la lectura/escritura de archivos
+* encryptor: 	provee funciones para la encrypcion/desencripcion con blowfish y cast5
 
 Para el desarrollo de los componentes, se decidio utilizar la tecnica TDD (Test Driven Development), para garantizar el 
 funcionamiento unitario de cada componente y mejorar la calidad final del software. Por ello, se uso la libreria 
@@ -347,16 +344,16 @@ El flujo del programa es el siguiente:
 		--------
         |MPIRUN|
         --------
-			|	    ----------- 
+			|       ----------- 
 			|-------|PROCESO 1|
-			|	    -----------
+			|       -----------
 			|			
-			|	    -----------         
+			|       -----------         
 			|-------|PROCESO 2|
-			|	    -----------
-		   ...			...
-           ...          ...
-			|	    -----------         
+			|       -----------
+		   ...
+           ...
+			|       -----------         
 			--------|PROCESO N|
 				    -----------
 
@@ -403,11 +400,9 @@ fuerza bruta, se realizo una medicion del tiempo (en segundos) ocupado por cada 
 la cantidad de claves utilizadas en la desencripcion. Los datos obtenidos se presentan 
 en la siguiente tabla:
 
---------------------------------
-	Tiempos de Ejecucion
---------------------------------			
+			
  claves	|serial	|openMP	|openMPI
---------------------------------
+--------|-------|-------|-------
 1000	|0.061	|0.024	|1.072
 10000	|0.539	|0.198	|1.339
 100000	|5.321	|1.75	|3.864
@@ -421,11 +416,9 @@ que se aumenta la cantidad de trabajadores disponibles. En el caso de la impleme
 siempre hay un trabajador. Para OpenMP los trabajadores son los hilos que ejecutan la seccion 
 paralela del codigo, y para OpenMPI los trabajadores son los procesos utlizados para la ejecucion.
 
-----------------------------------------			
-		  Tiempos de Ejecucion			
-----------------------------------------
+
  hilos/procesos	|openmp	|serial	|openmpi
-----------------------------------------
+----------------|-------|-------|-------
 		1		|52.977	|53.175	|56.866
 		2		|26.611	|53.175	|29.194
 		4		|16.646	|53.175	|18.396
@@ -445,15 +438,15 @@ ejecucion y 4 procesos, respectivamente. Los resultados son los siguientes:
 
 * Desencripcion usando OpenMP
 
-real    26m55.728s
-user    107m41.000s
-sys 0m0.716s
+        real    26m55.728s
+        user    107m41.000s
+        sys     0m0.716s
 
 * Desencripcion usando MPI
 
-real    28m39.777s
-user    113m37.130s
-sys 0m3.668s
+        real    28m39.777s
+        user    113m37.130s
+        sys     0m3.668s
 
 
 RESULTADOS
@@ -461,26 +454,26 @@ RESULTADOS
 
 * Oliver1:
 
-	Frase: Nunca falta alguien que sobra.
-	Metodo: blowfish.
-	Clave: 46712343.
+        Frase: Nunca falta alguien que sobra.
+        Metodo: blowfish.
+        Clave: 46712343.
 
 * Oliver2:
 
-	Frase: El saber no ocupa lugar.
-	Metodo: cast5.
-	Clave: 49999913.
+        Frase: El saber no ocupa lugar.
+        Metodo: cast5.
+        Clave: 49999913.
 
 * Navarro1: 
 
-	Frase: Quien malandra, mal acaba.
-	Metodo: blowfish.
-	Clave: 99921223.
+        Frase: Quien malandra, mal acaba.
+        Metodo: blowfish.
+        Clave: 99921223.
 
 * Navarro2:
 
-	Frase: En el reino del reves, los gatos no dicen miau, dicen yes porque estudian mucho ingles.
-	Metodo: cast5.
-	Clave: 42904536.
+        Frase: En el reino del reves, los gatos no dicen miau, dicen yes porque estudian mucho ingles.
+        Metodo: cast5.
+        Clave: 42904536.
 
 

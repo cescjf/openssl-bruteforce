@@ -1,6 +1,6 @@
 CC=gcc
 MPICC=mpicc
-LDFLAGS=-std=c99 -O3 -Wall
+LDFLAGS?=-std=c99 -Wall -O3
 LDLIBS=-lcrypto -ldl
 CUNITLIB=-lcunit
 
@@ -87,7 +87,34 @@ $(OBJ)/encryptor.o: $(SRC)/encryptor.c $(INCLUDE)/encryptor.h
 $(OBJ)/commons.o: $(SRC)/commons.c $(INCLUDE)/commons.h
 	$(CC) $(LDFLAGS) -c $(SRC)/commons.c -o $@ $(LDLIBS)
 
-## commands
+# commands
 
-clean:
+gcov:
 	rm -f $(BIN)/* $(OBJ)/*
+	LDFLAGS="-std=c99 -Wall -O0 --coverage -g" $(MAKE) all
+	echo "Frase: Never be led astray onto the path of virtue." > testfile
+	./bin/encrypt testfile 499999 cast5 encryptedfile
+	CANT_KEYS=500000 ./bin/serial encryptedfile
+	cp obj/*.gcda obj/*gcno src/
+	lcov -o cov.info -c -d src/
+	genhtml -o cov cov.info
+
+gprof:
+	rm -f $(BIN)/* $(OBJ)/* 
+	LDFLAGS="-std=c99 -Wall -O0 -pg -g" $(MAKE) all
+	echo "Frase: Never be led astray onto the path of virtue." > testfile
+	./bin/encrypt testfile 499999 cast5 encryptedfile
+	CANT_KEYS=500000 ./bin/serial encryptedfile
+	gprof bin/serial gmon.out  > gprof.out
+
+memcheck:
+	rm -f $(BIN)/* $(OBJ)/*
+	LDFLAGS="-std=c99 -Wall -O0 -g" $(MAKE) all
+	echo "Frase: Never be led astray onto the path of virtue." > testfile
+	./bin/encrypt testfile 499999 cast5 encryptedfile
+	CANT_KEYS=500000 valgrind --leak-check=yes bin/serial encryptedfile
+	
+clean:
+	rm -f $(BIN)/* $(OBJ)/* 
+	rm -f src/*.gcno src/*.gcda
+	rm -fr cov

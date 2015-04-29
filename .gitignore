@@ -3,6 +3,8 @@
 *.ko
 *.obj
 *.elf
+*.gcno
+*.gcda
 
 # Libraries
 *.lib
@@ -21,3 +23,7 @@
 *.i*86
 *.x86_64
 *.hex
+
+#folders
+bin/
+cov/
