@@ -27,3 +27,8 @@
 #folders
 bin/
 cov/
+tmp/
+
+#files
+key
+report

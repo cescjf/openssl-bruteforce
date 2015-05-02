@@ -211,30 +211,56 @@ Para comparar la performance de las diferentes implementaciones de los algoritmo
 fuerza bruta, se realizo una medicion del tiempo (en segundos) ocupado por cada algoritmo, variando 
 la cantidad de claves utilizadas en la desencripcion. Los datos obtenidos se presentan en la siguiente tabla:
 
+#### Serial
 
- claves	|serial	|openMP	|openMPI
---------|-------|-------|-------
-1000	|0.061	|0.024	|1.072
-10000	|0.539	|0.198	|1.339
-100000	|5.321	|1.75	|3.864
-1000000 |53.175	|17.456	|29.167
+time | 1000 | 10000 | 100000 | 1000000
+-----|------|-------|--------|--------
+real | 0m0.061s | 0m0.569s | 0m5.648s | 0m56.276s
+user | 0m0.060s | 0m0.569s | 0m5.593s | 0m56.068s
+sys	 | 0m0.000s | 0m0.000s | 0m0.004s | 0m0.024s
 
-			
+
+#### OpenMP with 2 threads
+
+time | 1000 | 10000 | 100000 | 1000000
+-----|------|-------|--------|--------
+real | 0m0.039s | 0m0.289s | 0m2.858s | 0m28.525s
+user | 0m0.066s | 0m0.572s | 0m5.700s | 0m56.859s
+sys	 | 0m0.004s | 0m0.004s | 0m0.000s | 0m0.008s
+
+#### OpenMPI with 2 process
+
+time | 1000 | 10000 | 100000 | 1000000
+-----|------|-------|--------|--------
+real | 0m1.102s | 0m1.545s | 0m5.798s | 0m48.600s
+user | 0m0.150s | 0m1.023s | 0m9.487s | 1m34.728s
+sys	 | 0m0.023s | 0m0.029s | 0m0.051s | 0m0.157s
+
+
 Queda evidente que con un numero mayor de claves, la implementacion serial tiene un peor desempeño, 
 comparado con las implementaciones en paralelo.
 
-En la siguente tabla, se muestra como varian los tiempos de ejecucion de los algoritmos, a medida 
-que se aumenta la cantidad de trabajadores disponibles. En el caso de la implementacion serial, 
-siempre hay un trabajador. Para OpenMP los trabajadores son los hilos que ejecutan la seccion 
+### Escalabilidad
+
+En la siguente tabla, se muestra como varian los tiempos de ejecucion de los algoritmos en procesar 500000 claves, a medida 
+que se aumenta la cantidad de trabajadores disponibles. Para OpenMP los trabajadores son los hilos que ejecutan la seccion 
 paralela del codigo, y para OpenMPI los trabajadores son los procesos utlizados para la ejecucion.
 
-hilos/procesos	|openmp	|serial	|openmpi
-----------------|-------|-------|-------
-        1		|52.977	|53.175	|56.866
-        2		|26.611	|53.175	|29.194
-        4		|16.646	|53.175	|18.396
-        8		|16.501	|53.175	|19.398
-        16		|24.372	|53.175	|30.479
+#### Open MP
+
+time | 1 hilo | 2 hilos | 4 hilos | 8 hilos
+-----|--------|---------|---------|--------
+real | 0m28.106s | 0m14.607s | 0m12.655s | 0m15.364s
+user | 0m28.050s | 0m29.092s | 0m46.751s | 0m56.970s
+sys	 | 0m0.024s  | 0m0.044s  | 0m0.056s  | 0m0.028s
+
+#### Open MPI
+
+time | 1 proceso | 2 procesos | 4 procesos | 8 procesos
+-----|-----------|------------|------------|-----------
+real | 0m48.723s | 0m26.446s | 0m18.275s | 0m18.060s
+user | 0m48.486s | 0m50.305s | 0m56.223s | 0m56.618s
+sys	 | 0m0.133s  | 0m0.079s  | 0m0.172s  | 0m0.275s
 
 El mejor desempeño se logra utilizando una cantidad de trabajadores equivalente a la cantidad de 
 nucleos disponibles en el microprocesador. Al utilizar una cantidad superior, los tiempos de ejecucion 
@@ -267,7 +293,7 @@ utiliza la opcion -g para incorporar informacion de debugging
 
 ### Covertura de codigo
 
-El reporte completo puede generarse utilizando make gcov
+El reporte completo puede generarse utilizando make gcov-serial
 
 #### Resumen
 
@@ -318,7 +344,7 @@ de la aplicacion.
 
 ### Profiling
 
-El reporte completo puede generarse utilizando make gprof
+El reporte completo puede generarse utilizando make gprof-serial
 
 #### Resumen
 
@@ -352,7 +378,7 @@ de ejecucion es ocupado en esta function. Por lo tanto es imperativo un plan de 
 
 ### Uso de memoria
 
-El reporte completo puede generarse con make memcheck
+El reporte completo puede generarse con make memcheck-serial
 
 #### Resumen
 
@@ -420,6 +446,7 @@ ejecuta para cada uno de los algoritmos utilizados para la desencripcion.
 
 ## Recomendaciones
 
+* Crear stress tests para la funcion keygen_itokey
 * Refactorizar la funcion keygen_itokey:
     - Eliminar el ciclo for en la misma, si es posible.
     - Garantizar el funcionamiento de la misma luego de la refactorizacion, a traves de la ejecucion 

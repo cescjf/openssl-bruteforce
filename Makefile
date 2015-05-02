@@ -8,11 +8,12 @@ OBJ=obj
 BIN=bin
 SRC=src
 INCLUDE=include
+TEST=test
 
 SOURCES=$(SRC)/fs.c $(SRC)/keygen.c $(SRC)/encryptor.c $(SRC)/commons.c
 HEADERS=$(INCLUDE)/fs.h $(INCLUDE)/keygen.h $(INCLUDE)/encryptor.h $(INCLUDE)/commons.h
 OBJECTS=$(OBJ)/keygen.o $(OBJ)/fs.o $(OBJ)/encryptor.o $(OBJ)/commons.o
-TARGETS=$(BIN)/serial $(BIN)/omp $(BIN)/mpi $(BIN)/encrypt $(BIN)/decrypt
+TARGETS=$(BIN)/serial $(BIN)/omp $(BIN)/mpi $(BIN)/encrypt $(BIN)/decrypt $(BIN)/unit-tests
 
 all: $(TARGETS)
 
@@ -20,12 +21,19 @@ test: test-unit test-utils test-app
 
 test-unit: $(BIN)/unit-tests
 	@./$(BIN)/unit-tests 2> /dev/null
+	@rm -fr output/testfile
 
 test-app: $(TARGETS)
 	@bash ./scripts/test-app.sh
 
 test-utils: $(TARGETS)
 	@bash ./scripts/test-utils.sh
+
+test-times: $(TARGETS)
+	@bash ./scripts/test-times.sh
+
+test-scalability: $(TARGETS)
+	@bash ./scripts/test-scalability.sh
 
 install: 
 	@bash ./scripts/install-libs.sh
@@ -53,7 +61,7 @@ $(BIN)/decrypt: $(OBJ)/decrypt.o $(OBJECTS)
 ## tests files
 
 $(BIN)/unit-tests: $(OBJ)/unit-tests.o $(OBJECTS)
-	$(CC) $(LDFLAGS) -L/usr/local/lib $^ -o $@ $(LDLIBS) $(CUNITLIB) -fopenmp
+	$(CC) $(LDFLAGS) -L/usr/local/lib $^ -o $@ $(LDLIBS) $(CUNITLIB)
 
 ## object files
 
@@ -66,8 +74,8 @@ $(OBJ)/omp.o: $(SRC)/omp.c $(HEADERS)
 $(OBJ)/mpi.o: $(SRC)/mpi.c $(HEADERS)
 	$(MPICC) $(LDFLAGS) -c $(SRC)/mpi.c -o $@
 
-$(OBJ)/unit-tests.o: $(SRC)/unit-tests.c $(HEADERS)
-	$(CC) $(LDFLAGS) -c $(SRC)/unit-tests.c -o $@ $(LDLIBS) -fopenmp
+$(OBJ)/unit-tests.o: $(TEST)/unit-tests.c $(HEADERS)
+	$(CC) $(LDFLAGS) -c $(TEST)/unit-tests.c -o $@ $(LDLIBS)
 
 $(OBJ)/encrypt.o: $(SRC)/encrypt.c $(HEADERS)
 	$(CC) $(LDFLAGS) -c $(SRC)/encrypt.c -o $@ $(LDLIBS) 
@@ -89,32 +97,43 @@ $(OBJ)/commons.o: $(SRC)/commons.c $(INCLUDE)/commons.h
 
 # commands
 
-gcov:
-	rm -f $(BIN)/* $(OBJ)/*
+gcov: clean-bin
 	LDFLAGS="-std=c99 -Wall -O0 --coverage -g" $(MAKE) all
-	echo "Frase: Never be led astray onto the path of virtue." > testfile
-	./bin/encrypt testfile 499999 cast5 encryptedfile
-	CANT_KEYS=500000 ./bin/serial encryptedfile
-	cp obj/*.gcda obj/*gcno src/
-	lcov -o cov.info -c -d src/
+
+lcov:
+	lcov -o cov.info -c -d obj/
 	genhtml -o cov cov.info
 
-gprof:
-	rm -f $(BIN)/* $(OBJ)/* 
+gprof: clean-bin
 	LDFLAGS="-std=c99 -Wall -O0 -pg -g" $(MAKE) all
-	echo "Frase: Never be led astray onto the path of virtue." > testfile
-	./bin/encrypt testfile 499999 cast5 encryptedfile
-	CANT_KEYS=500000 ./bin/serial encryptedfile
+
+memcheck: clean-bin
+	LDFLAGS="-std=c99 -Wall -O0 -g" $(MAKE) all
+
+gcov-serial: gcov
+	echo "Frase: Never be led astray onto the path of virtue." > tmp/testfile
+	./bin/encrypt tmp/testfile 499999 cast5 tmp/encryptedfile
+	CANT_KEYS=500000 ./bin/serial tmp/encryptedfile
+	$(MAKE) lcov
+
+gprof-serial: gprof
+	echo "Frase: Never be led astray onto the path of virtue." > tmp/testfile
+	./bin/encrypt tmp/testfile 499999 cast5 tmp/encryptedfile
+	CANT_KEYS=500000 ./bin/serial tmp/encryptedfile
 	gprof bin/serial gmon.out  > gprof.out
 
-memcheck:
-	rm -f $(BIN)/* $(OBJ)/*
-	LDFLAGS="-std=c99 -Wall -O0 -g" $(MAKE) all
+memcheck-serial: memcheck
 	echo "Frase: Never be led astray onto the path of virtue." > testfile
 	./bin/encrypt testfile 499999 cast5 encryptedfile
 	CANT_KEYS=500000 valgrind --leak-check=yes bin/serial encryptedfile
 	
-clean:
+clean: clean-bin clean-gprof clean-gcov
+
+clean-bin:
 	rm -f $(BIN)/* $(OBJ)/* 
-	rm -f src/*.gcno src/*.gcda
-	rm -fr cov
+
+clean-gprof:
+	rm -fr gmon.out gprof.out
+
+clean-gcov:
+	rm -fr cov cov.info

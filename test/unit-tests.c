@@ -251,7 +251,7 @@ void test_fs_validation(void)
 
 void test_fs_write_read(void)
 {
-	char* path = "./output/testfile";
+	char* path = "./tmp/testfile";
 	unsigned char input[8] = "1234567";
 	unsigned char output[8];
 
@@ -286,7 +286,6 @@ void test_keygen_keys(void)
 
 	keygen_getenv( &cant_keys );
 
-	#pragma omp parallel for shared(error)
 	for( int i = 0; i < cant_keys; i++ ) {
 		if( error == 0 ) {
 
