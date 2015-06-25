@@ -25,6 +25,7 @@ int main( int argc, char* argv[] )
 	unsigned char encrypted_text[8];
 	unsigned char iv[ IV_LENGTH ] = {1,2,3,4,5,6,7,8};
 	unsigned char key[ KEY_LENGTH ];
+	int keygen_characters[10] = {'0','1','2','3','4','5','6','7','8','9'};
 	time_t start_time, end_time;
 
 	// init mpi
@@ -56,32 +57,37 @@ int main( int argc, char* argv[] )
 	else {
 		last = first + chunk;
 	}
+	
+	memset(key,ASCII_SPACE,KEY_LENGTH);
 
 	for( long i = first; i < last && success_key == - 1; i++ ) {
 
-		keygen_itokey( key, i );
-
-		encryptor_set_key( &decryptor[0], key );
-        encryptor_init( &decryptor[0] );
-        encryptor_update( &decryptor[0] );
-        encryptor_final( &decryptor[0] );
+		key[KEY_LENGTH-1] = keygen_characters[i % 10];
+		key[KEY_LENGTH-2] = i/10? keygen_characters[(i/10) % 10] : ASCII_SPACE;
+		key[KEY_LENGTH-3] = i/100? keygen_characters[(i/100) % 10] : ASCII_SPACE;
+		key[KEY_LENGTH-4] = i/1000? keygen_characters[(i/1000) % 10] : ASCII_SPACE;
+		key[KEY_LENGTH-5] = i/10000? keygen_characters[(i/10000) % 10] : ASCII_SPACE;
+		key[KEY_LENGTH-6] = i/100000? keygen_characters[(i/100000) % 10] : ASCII_SPACE;
+		key[KEY_LENGTH-7] = i/1000000? keygen_characters[(i/1000000) % 10] : ASCII_SPACE;
+		key[KEY_LENGTH-8] = i/10000000? keygen_characters[(i/10000000) % 10] : ASCII_SPACE;
+		
+		encryptor_execute( &decryptor[0], key );
+		//encryptor_set_key( &decryptor[0], key );
+        //encryptor_init( &decryptor[0] );
+        //encryptor_update( &decryptor[0] );
+        //encryptor_final( &decryptor[0] );
 
         if( memcmp( (char *)decryptor[0].output, "Frase", 5 ) == 0 ) {
 			success_key = i;
             encryption_method = BLOWFISH;
             break;
         }
-
-	}
-
-	for( long i = first; i < last && success_key == -1; i++ ) {
-
-		keygen_itokey( key, i );
-
-        encryptor_set_key( &decryptor[1], key );
-        encryptor_init( &decryptor[1] );
-        encryptor_update( &decryptor[1] );
-        encryptor_final( &decryptor[1] );
+		
+		encryptor_execute( &decryptor[1], key );
+		//encryptor_set_key( &decryptor[1], key );
+        //encryptor_init( &decryptor[1] );
+        //encryptor_update( &decryptor[1] );
+        //encryptor_final( &decryptor[1] );
 
         if( memcmp( (char *)decryptor[1].output, "Frase", 5 ) == 0 ) {
 			success_key = i;

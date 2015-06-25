@@ -111,4 +111,10 @@ int encryptor_update( Encryptor *data );
  */
 int encryptor_final( Encryptor *data );
 
+/**
+ * execute set_key, init, update and final in one step
+ * @param [data]    a valid encryptor pointer
+ */
+void encryptor_execute( Encryptor *data, unsigned char key[ KEY_LENGTH ] );
+
 #endif

@@ -19,6 +19,7 @@ int main(int argc, char** argv)
 	unsigned char encrypted_text[ BLOCK_SIZE ];
     unsigned char iv[ IV_LENGTH ] = {1,2,3,4,5,6,7,8};
     unsigned char **key = NULL;
+	int keygen_characters[10] = {'0','1','2','3','4','5','6','7','8','9'};
     long cant_keys;
     long success_key = -1;
     int encryption_method = -1;
@@ -78,40 +79,43 @@ int main(int argc, char** argv)
 			printf("\nerror on key memory allocation\n");
         	exit(-1);
 		}
+		
+		memset(key[i],ASCII_SPACE,KEY_LENGTH);
 	}
 
 	#pragma omp parallel for private( thread_id ) shared( success_key, encryption_method )
 	for(long i = 0; i < cant_keys ; i++ ) {
 		if( success_key == -1 ) {
-
 			thread_id = omp_get_thread_num();
-			keygen_itokey( key[ thread_id ], i );
-
+			
+			key[ thread_id ][KEY_LENGTH-1] = keygen_characters[i % 10];
+			key[ thread_id ][KEY_LENGTH-2] = i/10? keygen_characters[(i/10) % 10] : ASCII_SPACE;
+			key[ thread_id ][KEY_LENGTH-3] = i/100? keygen_characters[(i/100) % 10] : ASCII_SPACE;
+			key[ thread_id ][KEY_LENGTH-4] = i/1000? keygen_characters[(i/1000) % 10] : ASCII_SPACE;
+			key[ thread_id ][KEY_LENGTH-5] = i/10000? keygen_characters[(i/10000) % 10] : ASCII_SPACE;
+			key[ thread_id ][KEY_LENGTH-6] = i/100000? keygen_characters[(i/100000) % 10] : ASCII_SPACE;
+			key[ thread_id ][KEY_LENGTH-7] = i/1000000? keygen_characters[(i/1000000) % 10] : ASCII_SPACE;
+			key[ thread_id ][KEY_LENGTH-8] = i/10000000? keygen_characters[(i/10000000) % 10] : ASCII_SPACE;
+			
 			// BLOWFISH
-			encryptor_set_key( &bf[ thread_id ], key[ thread_id ] );
-			encryptor_init( &bf[ thread_id ] );
-			encryptor_update( &bf[ thread_id ] );
-			encryptor_final( &bf[ thread_id ] );
+			encryptor_execute( &bf[ thread_id ], key[ thread_id ]);
+			//encryptor_set_key( &bf[ thread_id ], key[ thread_id ] );
+			//encryptor_init( &bf[ thread_id ] );
+			//encryptor_update( &bf[ thread_id ] );
+			//encryptor_final( &bf[ thread_id ] );
 
 			if( memcmp( (char *)bf[ thread_id ].output, "Frase", 5 ) == 0 ) {
 				success_key = i;
 				encryption_method = BLOWFISH;
 			}
-		}
-	}
-
-	#pragma omp parallel for private( thread_id ) shared( success_key, encryption_method )
-	for(long i = 0; i < cant_keys ; i++ ) {
-		if( success_key == -1 ) {
-
-			thread_id = omp_get_thread_num();
-			keygen_itokey( key[ thread_id ], i );
-
+			
 			//CAST5
-			encryptor_set_key( &cast5[ thread_id ], key[ thread_id ] );
-            encryptor_init( &cast5[ thread_id ] );
-			encryptor_update( &cast5[ thread_id ] );
-			encryptor_final( &cast5[ thread_id ] );
+			encryptor_execute( &cast5[ thread_id ], key[ thread_id ] );
+            
+			//encryptor_set_key( &cast5[ thread_id ], key[ thread_id ] );
+            //encryptor_init( &cast5[ thread_id ] );
+			//encryptor_update( &cast5[ thread_id ] );
+			//encryptor_final( &cast5[ thread_id ] );
 
             if( memcmp( (char *)cast5[ thread_id ].output, "Frase", 5 ) == 0 ) {
                	success_key = i;

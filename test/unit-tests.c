@@ -40,6 +40,7 @@ void test_fs_write_read(void);
 void test_keygen_getenv(void);
 void test_keygen_keys(void);
 void test_keygen_validation(void);
+void test_keygen_keys_adhoc(void);
 
 int main()
 {
@@ -79,6 +80,7 @@ int main()
 	/* add keygen tests */
 	error += NULL == CU_add_test( keygen_suite, "test of keygen getenv", test_keygen_getenv );
 	error += NULL == CU_add_test( keygen_suite, "test of keygen key generation", test_keygen_keys );
+	error += NULL == CU_add_test( keygen_suite, "test of keygen key generation adhoc", test_keygen_keys_adhoc );
 	error += NULL == CU_add_test( keygen_suite, "test of keygen validation", test_keygen_validation );
 
 	if( error != 0 )
@@ -283,16 +285,51 @@ void test_keygen_keys(void)
 {
 	long cant_keys;
 	int error = 0;
-
+	unsigned char key[ KEY_LENGTH + 1 ];
+	
 	keygen_getenv( &cant_keys );
+	key[ KEY_LENGTH ] = '\0';
 
 	for( int i = 0; i < cant_keys; i++ ) {
 		if( error == 0 ) {
 
-			unsigned char key[ KEY_LENGTH + 1 ];
 			keygen_itokey( key,i );
-			key[ KEY_LENGTH ] = '\0';
 
+			if( strtol( ( char* ) key, NULL, 0 ) != i ) {
+				error = i;
+			}
+		}
+	}
+
+	if( error ) {
+		printf("fail to generate key %d ",error);
+		CU_FAIL();
+	}
+		
+}
+
+void test_keygen_keys_adhoc(void)
+{
+	long cant_keys;
+	int error = 0;
+	int keygen_characters[10] = {'0','1','2','3','4','5','6','7','8','9'};
+	unsigned char key[ KEY_LENGTH + 1 ];
+	
+	keygen_getenv( &cant_keys );
+	memset(key,ASCII_SPACE,KEY_LENGTH);
+	key[ KEY_LENGTH ] = '\0';
+	
+	for( int i = 0; i < cant_keys; i++ ) {
+		if( error == 0 ) {
+			key[KEY_LENGTH-1] = keygen_characters[i % 10];
+			key[KEY_LENGTH-2] = i/10? keygen_characters[(i/10) % 10] : ASCII_SPACE;
+			key[KEY_LENGTH-3] = i/100? keygen_characters[(i/100) % 10] : ASCII_SPACE;
+			key[KEY_LENGTH-4] = i/1000? keygen_characters[(i/1000) % 10] : ASCII_SPACE;
+			key[KEY_LENGTH-5] = i/10000? keygen_characters[(i/10000) % 10] : ASCII_SPACE;
+			key[KEY_LENGTH-6] = i/100000? keygen_characters[(i/100000) % 10] : ASCII_SPACE;
+			key[KEY_LENGTH-7] = i/1000000? keygen_characters[(i/1000000) % 10] : ASCII_SPACE;
+			key[KEY_LENGTH-8] = i/10000000? keygen_characters[(i/10000000) % 10] : ASCII_SPACE;
+			
 			if( strtol( ( char* ) key, NULL, 0 ) != i ) {
 				error = i;
 			}

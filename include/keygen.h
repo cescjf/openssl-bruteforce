@@ -23,6 +23,15 @@
  */
 int keygen_itokey( unsigned char key[KEY_LENGTH], long number );
 
+
+/**
+ * Generate key from number
+ * @param [key]		buffer to save the generated key
+ * @param [number]	number to convert to key
+ * @return error
+ */
+void keygen_itokey_v1( unsigned char key[KEY_LENGTH], long number );
+
 /**
  * Read enviroment variables and get the number of keys
  * @param [cant_keys]	where to save the number of keys

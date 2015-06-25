@@ -13,7 +13,7 @@ TEST=test
 SOURCES=$(SRC)/fs.c $(SRC)/keygen.c $(SRC)/encryptor.c $(SRC)/commons.c
 HEADERS=$(INCLUDE)/fs.h $(INCLUDE)/keygen.h $(INCLUDE)/encryptor.h $(INCLUDE)/commons.h
 OBJECTS=$(OBJ)/keygen.o $(OBJ)/fs.o $(OBJ)/encryptor.o $(OBJ)/commons.o
-TARGETS=$(BIN)/serial $(BIN)/omp $(BIN)/mpi $(BIN)/encrypt $(BIN)/decrypt $(BIN)/unit-tests
+TARGETS=$(BIN)/serial $(BIN)/omp $(BIN)/mpi $(BIN)/encrypt $(BIN)/decrypt $(BIN)/unit-tests $(BIN)/stress-tests
 
 all: $(TARGETS)
 
@@ -23,6 +23,9 @@ test-unit: $(BIN)/unit-tests
 	@./$(BIN)/unit-tests 2> /dev/null
 	@rm -fr output/testfile
 
+test-stress: $(TARGETS)
+	@./$(BIN)/stress-tests
+	
 test-app: $(TARGETS)
 	@bash ./scripts/test-app.sh
 
@@ -62,6 +65,9 @@ $(BIN)/decrypt: $(OBJ)/decrypt.o $(OBJECTS)
 
 $(BIN)/unit-tests: $(OBJ)/unit-tests.o $(OBJECTS)
 	$(CC) $(LDFLAGS) -L/usr/local/lib $^ -o $@ $(LDLIBS) $(CUNITLIB)
+	
+$(BIN)/stress-tests: $(OBJ)/stress-tests.o $(OBJECTS)
+	$(CC) $(LDFLAGS) -L/usr/local/lib $^ -o $@ $(LDLIBS) $(CUNITLIB)
 
 ## object files
 
@@ -76,6 +82,9 @@ $(OBJ)/mpi.o: $(SRC)/mpi.c $(HEADERS)
 
 $(OBJ)/unit-tests.o: $(TEST)/unit-tests.c $(HEADERS)
 	$(CC) $(LDFLAGS) -c $(TEST)/unit-tests.c -o $@ $(LDLIBS)
+
+$(OBJ)/stress-tests.o: $(TEST)/stress-tests.c $(HEADERS)
+	$(CC) $(LDFLAGS) -c $(TEST)/stress-tests.c -o $@ $(LDLIBS)
 
 $(OBJ)/encrypt.o: $(SRC)/encrypt.c $(HEADERS)
 	$(CC) $(LDFLAGS) -c $(SRC)/encrypt.c -o $@ $(LDLIBS) 
@@ -110,6 +119,9 @@ gprof: clean-bin
 memcheck: clean-bin
 	LDFLAGS="-std=c99 -Wall -O0 -g" $(MAKE) all
 
+cachegrind: clean-bin
+	LDFLAGS="-std=c99 -Wall -O0 -g" $(MAKE) all
+
 gcov-serial: gcov
 	echo "Frase: Never be led astray onto the path of virtue." > tmp/testfile
 	./bin/encrypt tmp/testfile 499999 cast5 tmp/encryptedfile
@@ -126,6 +138,12 @@ memcheck-serial: memcheck
 	echo "Frase: Never be led astray onto the path of virtue." > testfile
 	./bin/encrypt testfile 499999 cast5 encryptedfile
 	CANT_KEYS=500000 valgrind --leak-check=yes bin/serial encryptedfile
+	
+cachegrind-serial: cachegrind
+	echo "Frase: Never be led astray onto the path of virtue." > testfile
+	./bin/encrypt testfile 50000 cast5 encryptedfile
+	CANT_KEYS=50000 valgrind --tool=cachegrind bin/serial encryptedfile
+
 	
 clean: clean-bin clean-gprof clean-gcov
 

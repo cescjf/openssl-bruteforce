@@ -121,3 +121,10 @@ int encryptor_final( Encryptor *data )
     return ( error != 1 );
 }
 
+void encryptor_execute( Encryptor *data, unsigned char key[ KEY_LENGTH ] )
+{
+	//memcpy( data->key, key, KEY_LENGTH );
+	EVP_CipherInit_ex( &data->ctx, data->cipher, NULL, key, data->iv, data->action );
+	EVP_CipherUpdate( &data->ctx, data->output, &data->output_length, data->input, data->input_size );
+	EVP_CipherFinal_ex( &data->ctx, data->output + data->output_length, &data->padding_length );
+}

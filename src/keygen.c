@@ -2,6 +2,7 @@
 
 static long keygen_mults[8] = {1,10,100,1000,10000,100000,1000000,10000000};
 static long keygen_cant_keys = CANT_KEYS;
+int keygen_characters[10] = {'0','1','2','3','4','5','6','7','8','9'};
 
 int keygen_getenv( long* cant_keys )
 {
@@ -15,7 +16,7 @@ int keygen_getenv( long* cant_keys )
 		*cant_keys = CANT_KEYS;
 		keygen_cant_keys = CANT_KEYS;
 	}
-
+	
 	return 0;
 }
 
@@ -53,5 +54,15 @@ int keygen_itokey( unsigned char key[ KEY_LENGTH ], long number )
 	return 0;
 }
 
-
-
+void keygen_itokey_v1( unsigned char key[ KEY_LENGTH ], long number )
+{	
+	unsigned char* pointer = &key[KEY_LENGTH-1];
+	
+	*pointer = ASCII_ZERO;
+	
+	for( ; number > 0; --pointer )
+	{
+			*pointer = keygen_characters[number % 10];
+			number = number / 10;
+	}
+}
