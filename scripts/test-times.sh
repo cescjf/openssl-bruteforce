@@ -2,7 +2,7 @@
 
 ## this encrypt a text with the encryptor, and test the main app if it can find the text
 ENCRYPT=bin/encrypt
-SERIAL=bin/serial
+SERIAL=bin/serial-min
 OMP=bin/omp
 MPI=bin/mpi
 
@@ -25,22 +25,22 @@ do
 	echo
 done
 
-for I in 1000 10000 100000 1000000
-do
-    echo "OpenMP time for $I keys with 2 threads"
-	export CANT_KEYS=$I
-	export OMP_NUM_THREADS=2
-    time ./$OMP $ENCRYPTED_FILE
-    echo
-done
+#for I in 1000 10000 100000 1000000
+#do
+#    echo "OpenMP time for $I keys with 2 threads"
+#	export CANT_KEYS=$I
+#	export OMP_NUM_THREADS=2
+#    time ./$OMP $ENCRYPTED_FILE
+#    echo
+#done
 
-for I in 1000 10000 100000 1000000
-do
-    echo "OpenMPI time for $I keys with 2 proceses"
-	export CANT_KEYS=$I
-    time mpirun -np 2 $MPI $ENCRYPTED_FILE
-    echo
-done
+#for I in 1000 10000 100000 1000000
+#do
+#    echo "OpenMPI time for $I keys with 2 proceses"
+#	export CANT_KEYS=$I
+#    time mpirun -np 2 $MPI $ENCRYPTED_FILE
+#    echo
+#done
 
 echo "============================================="
 echo

@@ -1,4 +1,4 @@
-CC=gcc
+CC=gcc-4.9
 MPICC=mpicc
 LDFLAGS?=-std=c99 -Wall -O3
 LDLIBS=-lcrypto -ldl
@@ -48,6 +48,10 @@ report:
 
 $(BIN)/serial: $(OBJ)/serial.o $(OBJECTS)
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
+	
+$(BIN)/serial-min: 
+	$(CC) $(LDFLAGS) $(SRC)/serial-min.c  -o $@ -lcrypto
+	
 
 $(BIN)/omp: $(OBJ)/omp.o $(OBJECTS)
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS) -fopenmp
@@ -128,11 +132,11 @@ gcov-serial: gcov
 	CANT_KEYS=500000 ./bin/serial tmp/encryptedfile
 	$(MAKE) lcov
 
-gprof-serial: gprof
+gprof-serial:
 	echo "Frase: Never be led astray onto the path of virtue." > tmp/testfile
-	./bin/encrypt tmp/testfile 499999 cast5 tmp/encryptedfile
-	CANT_KEYS=500000 ./bin/serial tmp/encryptedfile
-	gprof bin/serial gmon.out  > gprof.out
+	./bin/encrypt tmp/testfile 499999 blowfish tmp/encryptedfile
+	CANT_KEYS=500 ./bin/serial-min tmp/encryptedfile
+	gprof ./bin/serial-min gmon.out  > gprof.out
 
 memcheck-serial: memcheck
 	echo "Frase: Never be led astray onto the path of virtue." > testfile
